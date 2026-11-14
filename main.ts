@@ -1,62 +1,17 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-interface VerseSection {
-  readonly lines: readonly string[];
-}
+const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 
-const SECTIONS: readonly VerseSection[] = [
-  {
-    "lines": [
-      "Behind the Curtain"
-    ]
-  },
-  {
-    "lines": [
-      "For three weeks my civic agent read every bill,",
-      "compared tax tables, scored the council candidates",
-      "ninety-four percent aligned with how I voted in 2022.",
-      "By Tuesday morning my ballot was solved on a neat half-page:",
-      "Yes on A, No on B, Skip the rest."
-    ]
-  },
-  {
-    "lines": [
-      "Inside the folding booth, holding an ink marker",
-      "over thick gray paper, I reached Measure C—",
-      "the school clinic bond the model had flagged in red:",
-      "high cost, weak return, wrong neighborhood for my zip code."
-    ]
-  },
-  {
-    "lines": [
-      "Nobody stood behind the canvas curtain.",
-      "No log timed how long my wrist held still."
-    ]
-  },
-  {
-    "lines": [
-      "I tucked the cheat sheet back into my pocket",
-      "and colored in the oval it had crossed out—",
-      "glad for one small dark room",
-      "where my reasons don't have to add up."
-    ]
+const POEM: string = "The Red Line\n\nThe mastering plugin cleaned the final take:\nhum removed, lip-smack scrubbed away,\nthe room noise levelled to minus ninety dB.\nIt drew a green line over the waveform\nand flagged measure forty-two:\ntrumpet peak exceeds threshold by two point four.\nSuggest: brickwall limiter, pull down the brass.\n\nI looked at the sapphire stylus on the lathe,\nthen listened through the monitors with my eyes closed.\nAt forty-two, old Coleman had stood up from his chair,\nleaned into the ribbon mic, and blown so hard\nhis spit hit the windscreen.\nThe horn tore open like tin.\nA man who knew he had one chorus left.\n\nI clicked reject on the limiter.\nI dropped the cutting head onto the blank lacquer\nand let the needle cut right through the red.\nThe software wanted a record.\nColeman wanted the room to shake.";
+
+function main(): void {
+  const codePoints = [...POEM].length;
+  if (codePoints < 1 || codePoints > 1000 || !POEM.trim()) {
+    throw new Error(`Invalid poem length: ${codePoints}`);
   }
-];
-
-function renderPoem(): string {
-  const body = SECTIONS.map((s) => s.lines.join("\n")).join("\n\n");
-  const codePoints = [...body].length;
-  if (codePoints < 1 || codePoints > 1000 || !body.trim()) {
-    throw new Error(`Invalid entry size: ${codePoints}`);
-  }
-  return body;
+  mkdirSync(OUTPUT_DIR, { recursive: true });
+  writeFileSync(join(OUTPUT_DIR, "entry.txt"), POEM, "utf-8");
 }
 
-async function main(): Promise<void> {
-  const dest = process.env.MAKEFUN_OUTPUT_DIR || "/output";
-  await mkdir(dest, { recursive: true });
-  await writeFile(join(dest, "entry.txt"), Buffer.from(renderPoem(), "utf8"));
-}
-
-await main();
+main();
